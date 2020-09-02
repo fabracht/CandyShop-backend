@@ -1,0 +1,44 @@
+{
+  "name": "meninasdoceiras-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/server.js",
+  "scripts": {
+    "compile": "shx rm -rf lib/ && tsc",
+    "dev": "ts-node-dev --no-notify src/server",
+    "start": "npm run compile && node lib/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fabricio Bracht",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.9.1",
+    "@typescript-eslint/parser": "^3.9.1",
+    "eslint": "^7.7.0",
+    "ts-node-dev": "^1.0.0-pre.58",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/body-parser": "^1.19.0",
+    "@types/cookie-session": "^2.0.41",
+    "@types/express": "^4.17.7",
+    "@types/jsonwebtoken": "^8.5.0",
+    "@types/jwt-decode": "^2.2.1",
+    "@types/mongoose": "^5.7.36",
+    "@types/morgan": "^1.9.1",
+    "@types/validator": "^13.1.0",
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "cookie-session": "^1.4.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^2.2.0",
+    "mongoose": "^5.10.0",
+    "morgan": "^1.10.0",
+    "typed-promisify": "^0.4.0",
+    "validator": "^13.1.1"
+  }
+}
