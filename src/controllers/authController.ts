@@ -1,18 +1,21 @@
 import { Response, NextFunction } from "express";
 import { User } from "../models/userModel";
 import { AppError } from "../utils/AppError";
-import { IRequestWithBody, IUser } from "../utils/types";
+import { IRequestWithBody, IUser, IUserDocument } from "../utils/types";
 import jwt, { Secret } from "jsonwebtoken";
 
 const signToken = (id: string) => {
   const secret: Secret = process.env.JWT_SECRET || "";
   return jwt.sign({ id }, secret, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-export const signup = async (req: IRequestWithBody, res: Response): Promise<Response> => {
-  const user: IUser = req.body as unknown as IUser;
+export const signup = async (
+  req: IRequestWithBody,
+  res: Response
+): Promise<Response> => {
+  const user: IUser = (req.body as unknown) as IUser;
 
   try {
     const newUser = await User.create(user);
@@ -20,13 +23,13 @@ export const signup = async (req: IRequestWithBody, res: Response): Promise<Resp
     return res.status(201).json({
       status: "success",
       headers: {
-        "access_token": token,
-        "token_type": "JWT",
-        "expires_in": process.env.JWT_EXPIRES_IN,
+        access_token: token,
+        token_type: "JWT",
+        expires_in: process.env.JWT_EXPIRES_IN,
       },
       data: {
         user: newUser,
-      }
+      },
     });
   } catch (err) {
     console.log(err);
@@ -34,7 +37,11 @@ export const signup = async (req: IRequestWithBody, res: Response): Promise<Resp
   }
 };
 
-export const login = async (req: IRequestWithBody, res: Response, next: NextFunction): Promise<Response|void> => {
+export const login = async (
+  req: IRequestWithBody,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
   const { email, password } = req.body;
   // VERIFY IF EMAIL AND PASSWORD ARE PRESENT
   if (!email || !password) {
@@ -45,28 +52,39 @@ export const login = async (req: IRequestWithBody, res: Response, next: NextFunc
   try {
     const user = await User.findOne({ email }).select("+password");
     // USING AN INSTANCE METHOD OF THE USER MODEL TO CHECK THE PASSWORD
-    if (!user || !(await user?.schema.methods.correctPassword(password, user.password))) {
+    if (
+      !user ||
+      !(await user?.schema.methods.correctPassword(password, user.password))
+    ) {
       return next(new AppError("Incorrect email or password", 401)); // UNAUTHORIZED
     }
     const token = signToken(user._id);
     return res.status(200).json({
       headers: {
-        "access_token": token,
-        "token_type": "JWT",
-        "expires_in": process.env.JWT_EXPIRES_IN,
+        access_token: token,
+        token_type: "JWT",
+        expires_in: process.env.JWT_EXPIRES_IN,
       },
       status: "success",
+      data: { user: { id: user._id } },
     });
   } catch (err) {
     console.log(err);
     return res.json({
       status: "fail",
-      message: err
+      message: err,
     });
   }
 };
 
-export const protect = async (req: IRequestWithBody, res: Response, next: NextFunction): Promise<Response|void> => {
+export const protect = async (
+  req: IRequestWithBody,
+  res: Response,
+  next: NextFunction
+): Promise<Response | void> => {
+  console.log(req.body);
+  console.log(req.headers);
+  const userId = req.params.id || "";
   const header: string | undefined = req.headers.authorization;
   let token = "";
   // GET TOKEN AND CHECK IF IT EXISTS
@@ -79,9 +97,9 @@ export const protect = async (req: IRequestWithBody, res: Response, next: NextFu
 
   // VERIFY TOKEN
   interface MyToken {
-    id: string,
-    iat: number,
-    exp: number,
+    id: string;
+    iat: number;
+    exp: number;
   }
 
   let dec: MyToken | undefined;
@@ -104,7 +122,13 @@ export const protect = async (req: IRequestWithBody, res: Response, next: NextFu
           )
         );
       }
-      req.body.user = freshUser.toJSON();
+      // HERE WE CHECK IF THE USER ID MATCHES THE TOKEN OWNER
+      if (`${freshUser._id}` !== userId) {
+        next("Token doesn't belong");
+      }
+      const result: IUserDocument = await freshUser.toJSON();
+      req.body.user = result.id as string;
+
       next();
     } catch (err) {
       return res.json({
@@ -116,7 +140,7 @@ export const protect = async (req: IRequestWithBody, res: Response, next: NextFu
     const error = new AppError("JsonWebTokenError: invalid token 😜 ", 500);
     return res.json({
       status: "fail",
-      message: error.message
+      message: error.message,
     });
   }
 };
