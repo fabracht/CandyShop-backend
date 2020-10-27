@@ -133,7 +133,7 @@ export const getOrders = async (
       });
       console.log(te);
       res.status(200).json({
-        status: "success",
+        result: "success",
         data: {
           orders: te,
           products: prodL,
@@ -141,13 +141,13 @@ export const getOrders = async (
       });
     } catch (err) {
       res.status(500).json({
-        status: "fail",
+        result: "fail",
         message: "Can't get order",
       });
     }
   } else {
     res.status(500).json({
-      status: "fail",
+      result: "fail",
       message: "Something wrong with the request",
     });
   }

@@ -1,6 +1,10 @@
 import { User } from "../models/userModel";
 import { Request, Response, NextFunction } from "express";
-import { IRequestWithBody, IUserDocument } from "../utils/types";
+import {
+  EResponseStatusType,
+  IRequestWithBody,
+  IUserDocument,
+} from "../utils/types";
 import { AppError } from "../utils/AppError";
 
 export const getAllUsers = async (req: IRequestWithBody, res: Response) => {
@@ -8,7 +12,7 @@ export const getAllUsers = async (req: IRequestWithBody, res: Response) => {
     const users = await User.find();
     // SEND RESPONSE
     res.status(200).json({
-      status: "success",
+      result: EResponseStatusType.success,
       results: users.length,
       data: {
         users,
@@ -16,7 +20,7 @@ export const getAllUsers = async (req: IRequestWithBody, res: Response) => {
     });
   } catch (err) {
     res.status(404).json({
-      status: "fail",
+      result: EResponseStatusType.fail,
       error: err,
     });
   }
@@ -34,7 +38,7 @@ export const getOneUser = async (
   }
   // ELSE
   res.status(200).json({
-    status: "success",
+    result: EResponseStatusType.success,
     data: {
       user,
     },
@@ -45,14 +49,14 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const createdUser = await User.create(req.body);
     res.status(200).json({
-      status: "success",
+      result: EResponseStatusType.success,
       data: {
         createdUser,
       },
     });
   } catch (err) {
     res.status(400).json({
-      status: "fail",
+      result: EResponseStatusType.fail,
       data: {
         err,
       },
@@ -73,21 +77,21 @@ export const updateUser = async (req: IRequestWithBody, res: Response) => {
       const updatedUser = await User.findOne({ _id: req.params.id });
 
       res.status(200).json({
-        status: "success",
+        result: EResponseStatusType.success,
         data: {
           updatedUser,
         },
       });
     } catch (err) {
       res.status(err.status).json({
-        status: "fail",
+        result: EResponseStatusType.fail,
         messsage: err.message,
       });
     }
   } else {
     const err = new AppError("Bad Request", 400);
     res.status(err.statusCode!).json({
-      status: "fail",
+      result: EResponseStatusType.fail,
       message: err.message,
     });
   }
@@ -99,20 +103,20 @@ export const deleteUser = async (req: IRequestWithBody, res: Response) => {
     if (!user) {
       const err = new AppError("User not found", 404);
       res.status(err.statusCode!).json({
-        status: "fail",
+        result: EResponseStatusType.fail,
         message: err.message,
       });
     } else {
       console.log(user);
 
       res.status(204).json({
-        status: "success",
+        result: EResponseStatusType.success,
         data: null,
       });
     }
   } catch (err) {
     res.json({
-      status: "fail",
+      result: EResponseStatusType.fail,
       message: err,
     });
   }

@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { app } from "./index";
 
 // DEAL WITH UNCAUGHT EXCEPTION
-process.on("uncaughtException", err => {
+process.on("uncaughtException", (err) => {
   console.log(err.name, err.message);
   console.log("UNCAUGHT EXCEPTION 💣 Shutting Down");
   process.exit(1); // UNCAUGHT EXCEPTION
@@ -11,15 +11,20 @@ process.on("uncaughtException", err => {
 
 // CONFIGURE ENV VARIABLES
 dotenv.config();
-const DB = process.env.DATABASE?.replace("<PASSWORD>", process.env.DATABASE_PASSWORD!);
+const DB = process.env.DATABASE?.replace(
+  "<PASSWORD>",
+  process.env.DATABASE_PASSWORD!
+);
 
 // CONNECT TO MONGOOSE DB
-mongoose.connect(DB!, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: true,
-  useUnifiedTopology: true
-}).then(() => console.log("DB connection successful"));
+mongoose
+  .connect(DB!, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("DB connection successful"));
 
 // DEFINE AND START SERVER
 const PORT = process.env.PORT || 3030;

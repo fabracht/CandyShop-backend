@@ -1,5 +1,10 @@
-import { Document, Schema } from "mongoose";
+import { Document } from "mongoose";
 import { Request } from "express";
+
+export enum EResponseStatusType {
+  success = "success",
+  fail = "fail",
+}
 
 export enum EProductType {
   taffy,
@@ -11,6 +16,7 @@ export enum EProductType {
 export interface IProduct {
   name: string;
   weight: number;
+  description: string;
   price: number;
   type: string;
   quantity: number;
@@ -61,6 +67,9 @@ export interface IUser {
   email: string;
   password: string;
   passwordChangedAt?: Date;
+  passwordResetToken?: String;
+  passwordResetExpires?: Date;
+  active?: boolean;
 }
 // MONGODB USER DOCUMENT INTERFACE
 // THIS CONTAINS ALL THE FIELDS TO BE PRESENT AS DATA
@@ -82,6 +91,7 @@ export interface IUserSchema extends IUserDocument {
     userPassword: string
   ): Promise<boolean>;
   changedPasswordAfter(JWTTimestamp: number): boolean;
+  createPasswordResetToken(user: IUserSchema): Promise<string | undefined>;
 }
 
 // MONGODB ORDER SCHEMA INTERFACE
