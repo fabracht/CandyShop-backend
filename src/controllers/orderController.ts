@@ -18,12 +18,13 @@ export const createOrder = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { user, nOfItems, totalCost, products } = req.body;
+  console.log(req.body);
+  const { nOfItems, totalCost, products } = req.body;
   let orderData: IOrder;
 
   // IF USER, NOFITEMS, TOTALCOST AND PRODUCTS ARE DEFINED
   // THIS VALIDATES THE INPUT
-  if (user && nOfItems && totalCost && products) {
+  if (req.cookies.uid && nOfItems && totalCost && products) {
     const prodArray = Array.from(products);
     const prodParsed: IBox[] = prodArray.map((el: Object) => {
       return el as IBox;
@@ -52,7 +53,7 @@ export const createOrder = async (
 
     // THIS IS THE ORDER DATA OBJECT
     orderData = {
-      userId: user,
+      userId: req.cookies.uid,
       nOfItems: parseInt(nOfItems),
       totalCost: parseFloat(totalCost),
       productList: prodParsed,

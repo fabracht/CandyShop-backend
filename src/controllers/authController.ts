@@ -137,6 +137,7 @@ export const login = async (
   next: NextFunction
 ): Promise<Response | void> => {
   const { email, password } = req.body;
+  console.log(req.body);
   // VERIFY IF EMAIL AND PASSWORD ARE PRESENT
   if (!email || !password) {
     return next(new AppError("Please provide email and password", 400));
@@ -160,13 +161,13 @@ export const login = async (
 
       res.cookie("jwt", token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        // httpOnly: true,
-        // secure: false,
+        httpOnly: true,
+        secure: false,
       });
       res.cookie("uid", user._id, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        // httpOnly: true,
-        // secure: false,
+        httpOnly: false,
+        secure: false,
       });
     } else {
       res.cookie("jwt", token, {
@@ -211,9 +212,10 @@ export const protect = async (
 ): Promise<Response | void> => {
   // let userId = req.params.id || "";
   let userId = "";
-
+  // console.log(req.cookies);
   const { cookies }: { cookies: IAuthCookie } = req;
-  console.log(cookies);
+  // console.log(cookies);
+  console.log("RUNNING PROTECT");
   if (!cookies?.uid) {
     return next(new AppError("Invalid credentials, please login again", 401));
   } else {

@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 app.use(express.json());
 app.use(cookieParser());
 app.use(function (req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "http://10.0.0.8:3000");
+  res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000");
   // res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -26,7 +26,7 @@ app.use(function (req, res, next) {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type, Accept, Authorization"
+    "X-Requested-With,Content-Type, Accept, Authorization, user-agent"
   );
   res.setHeader("Access-Control-Allow-Credentials", "true");
 

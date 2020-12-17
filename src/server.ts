@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { app } from "./index";
+import https from "https";
+import http from "http";
+import fs from "fs";
 
 // DEAL WITH UNCAUGHT EXCEPTION
 process.on("uncaughtException", (err) => {
@@ -28,15 +31,22 @@ mongoose
 
 // DEFINE AND START SERVER
 const PORT = process.env.PORT || 3030;
-const server = app.listen(PORT, () => {
-  console.log(`App running on port ${PORT}`);
-});
+const SPORT = process.env.SPORT || 443;
+var privateKey = fs.readFileSync(__dirname + "/ssl/server.key", "utf8");
+var certificate = fs.readFileSync(__dirname + "/ssl/server.crt", "utf8");
+
+var credentials = { key: privateKey, cert: certificate };
+http.createServer(app).listen(PORT);
+https.createServer(credentials, app).listen(SPORT);
+// const server = app.listen(PORT, () => {
+//   console.log(`App running on port ${PORT}`);
+// });
 
 // HANDLING ALL UNHANDLED REJECTIONS;
 process.on("unhandledRejection", (err: Error) => {
   console.log(err.name, err.message);
   console.log("UNHANDLED REJECTION 🚨 Shutting Down");
-  server.close(() => {
-    process.exit(1);
-  });
+  // server.close(() => {
+  //   process.exit(1);
+  // });
 });
