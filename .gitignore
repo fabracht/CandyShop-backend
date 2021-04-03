@@ -112,3 +112,6 @@ lib/
 data/
 
 !src/lib
+
+.fake
+.ionide
